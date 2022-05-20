@@ -1,0 +1,75 @@
+- 👋 Hi, I’m @kali-seset
+- 👀 I’m interested in ...
+- 🌱 I’m currently learning ...
+- 💞️ I’m looking to collaborate on ...
+- 📫 How to reach me ...
+
+<!---
+kali-seset/kali-seset is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+You can click the Preview link to take a look at your changes.
+--->
+
+lib = {}
+with open('kata/kamuskata.txt') as f:
+    i = 0
+    for line in f:
+        lib[line.replace('\n','').lower()] = i
+        i+=1
+#WORDS = [s.strip() for s in open('kata/kbbi.txt').read().split()]
+data = []
+#data_bab1
+with open('dataset/ProposalPKM/01data.txt', "r") as f:
+#for i in data_bab1:
+  #setting path
+  #path1 = open(path_bab1, "r") 
+  #all_dokumen_bersih.append(dokumen_bersih)
+  for line in f:
+      data.append(re.sub(r"[^A-Za-z0-9 ]","",re.sub(r"[^A-Za-z0-9\.\,\n ]"," ",line)).lower())
+
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
+#d = enchant.Dict("en_US")
+en = set(w.lower() for w in nltk.corpus.words.words())
+
+typo1 = {}
+for lineNum, line in enumerate(data,1):
+    currLine = []
+    currLine = line.split()
+    for wordNum, word in enumerate(currLine,1):
+        if not word.isdigit():
+            if word not in en:
+                if word not in lib.keys():    
+                    stemmed = stemmer.stem(word)
+                    if stemmed not in lib.keys():
+                        #print(stemmed)
+                        typo1[stemmed] = Typo(lineNum,wordNum,word)
+
+for word in typo1.keys():
+    print(word)
+    for x in range(0, len(word)):
+        if not b_any(i.startswith(word[0:x]) for i in lib.keys()):
+            typo1[word].setErrorIndexFront(x)
+            #print(word[0:x])
+            #print(word[0:typo[word].getErrorIndexFront() - 1])
+            break
+
+    for x in range(len(word) - 2, 0, -1):
+        if not b_any(i.endswith(word[x:len(word)]) for i in lib.keys()):
+            typo1[word].setErrorIndexRear(x)
+            #print(word[x:len(word)])
+            #print(word[typo[word].getErrorIndexRear()+1:len(word)])
+            break
+
+    for sug in lib.keys():
+        if abs(len(sug) - len(word))<2:
+            if sug.startswith(word[0:typo1[word].getErrorIndexFront() - 2]):
+                if sug.endswith(word[typo1[word].getErrorIndexRear() + 2:len(word)]):
+                    typo1[word].addSuggestion(sug)
+                    #print(sug)
+                elif sug.endswith(word[typo1[word].getErrorIndexRear() + 1:len(word)]):
+                    typo1[word].addSuggestion(sug)
+            elif sug.startswith(word[0:typo1[word].getErrorIndexFront() - 1]):
+                if sug.endswith(word[typo1[word].getErrorIndexRear() + 1:len(word)]):
+                    typo1[word].addSuggestion(sug)
+                elif sug.endswith(word[typo1[word].getErrorIndexRear() + 2:len(word)]):
+                    typo1[word].addSuggestion(sug)
