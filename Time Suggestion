@@ -1,0 +1,29 @@
+
+
+for word in typo1.keys():
+    for sug in typo1[word].getSuggestion().keys():
+        #todo
+        s = (typo1[word].getErrorIndexFront() - 1) + (len(word) - typo1[word].getErrorIndexRear() + 1)
+        n1 = len(word)
+        n2 = len(sug)
+        u1 = 0
+        u2 = 0
+        if n1 == n2:
+            u1 = len(word[(typo1[word].getErrorIndexFront() - 1):(len(word) - typo1[word].getErrorIndexRear() + 1)])
+            u2 = u1
+        else:
+            u2 = abs(n2 - n1)
+  
+        typo1[word].getSuggestion()[sug] = ((s ** 2) - ((n2 - n1) ** 2) - ((u1 + u2) ** 2)) / (s ** 2)                          
+          
+        print(typo1[word].getSuggestion()[sug])
+
+
+    for k,v in list(typo1[word].getSuggestion().items()):
+        if v <= 0:
+            del typo1[word].getSuggestion()[k]
+
+    #print(typo[word].getSuggestion())
+
+
+print("time = ",(time.time() - startTime)," s")
